@@ -23,11 +23,40 @@ frame and see what we have:
 ```{r}
 source_data <- read.csv("activity.csv", stringsAsFactors=FALSE)
 str(source_data)
-summary(source_data)
 ```
 
+Create an attribute for timestamps for each entry based on the date and
+interval attributes.
+
+```{r}
+source_data$timestamp <- strptime(paste(
+                                    source_data$date,
+                                    sub("(\\d{2})(\\d{2})",
+                                        "\\1:\\2",
+                                        sprintf("%04d", source_data$interval)
+                                    )
+                                  ),
+                                  "%Y-%m-%d %R")
+
+str(source_data)
+```
 
 ## What is mean total number of steps taken per day?
+
+Calculate the total number of steps taken per day:
+
+```{r}
+library(plyr)
+steps_per_day <- ddply(source_data, "date", summarise, total_steps=sum(steps))
+summary(steps_per_day)
+```
+
+Plot a histogram of steps per day:
+
+```{r}
+hist(steps_per_day$total_steps)
+```
+
 
 
 
